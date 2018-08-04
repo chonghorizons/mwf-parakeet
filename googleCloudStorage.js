@@ -1,15 +1,13 @@
 const restify = require("restify");
 const cors = require('cors')
-
-console.log(Object.keys(restify))
+const axios = require('axios')
+const myAddRoute="http://10.2.102.226:3195/api/v1/Image"
 
 const server = restify.createServer({
   name: 'restify-boilerplate',
 });
 
 server.use(restify.bodyParser());
-
-
 
 
 const fs = require("fs");
@@ -39,6 +37,13 @@ const GCSupload = (req, res) => {
       res.json(err);
     })
     .on('finish', () => {
+      let imageURIobject= {
+        imageURL:`https://storage.googleapis.com/${CLOUD_BUCKET}/${gcsname}`,
+        "category":["default"]
+      }
+      axios.post(myAddRoute, imageURIobject)
+      .then(response=>console.log("RESPONSE", response.data))
+      .catch(err=>console.log("ERROR", err))
       res.json({
         success: true,
         fileUrl: `https://storage.googleapis.com/${CLOUD_BUCKET}/${gcsname}`
@@ -46,7 +51,6 @@ const GCSupload = (req, res) => {
     });
 };
 
-server.use(bodyParser());
 server.post("/uploadToGCS", GCSupload);
 
 
