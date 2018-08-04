@@ -32,6 +32,7 @@ var Schema=mongoose.Schema
 var Image= mongoose.model('Image', new mongoose.Schema({
   imageURL: String,
   categories: [String],
+  createdAt: Date,
 }))
 
 var StoredGames= mongoose.model('Game', new mongoose.Schema({
@@ -44,6 +45,38 @@ restify.serve(router, StoredGames)
 
 
 app.use(router)
+
+app.get('/getOneSpecialCardThenEraseWithFallback', function(req, res) {
+  Image.find({categories: "special"}).count().exec(function(err,count) {
+    console.log("SPECIAL COUNT", count)
+    if (count>0) {
+      var random=Math.floor(Math.random()*count);
+      Image.findOneAndRemove({categories: "special"})
+      .exec(function(err, imageRecord) {
+        if (err) {
+          res.json(err)
+        } else {
+          res.json(imageRecord)
+        }
+      })
+    } else {
+      getOneImageRecordPromise()
+      .then((imageRec)=>{res.json(imageRec)})
+    }
+  })
+})
+
+app.get('/removeSpecialCards', function(req,res) {
+  Image.deleteMany({categories: "special"}).exec(
+    function (err, imageRecords) {
+      if(err) {
+        res.json(err)
+      } else {
+        res.json(imageRecords)
+      }
+    }
+  )
+})
 
 app.get('/getOneRandomCard', function(req,res) {
   Image.count().exec(function(err,count) {
@@ -90,7 +123,9 @@ function getOneImageRecordPromise() {
 // })
 // console.log("THIS WRONG")
 
+
 app.get('/getNRandomCard/:num', function(req,res) {
+  console.log("getNRandomCard", new Date())
   var myPromises=[];
   for (var i=1; i<=req.params.num; i++) {
     myPromises.push(getOneImageRecordPromise())

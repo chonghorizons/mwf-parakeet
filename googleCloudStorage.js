@@ -39,7 +39,8 @@ const GCSupload = (req, res) => {
     .on('finish', () => {
       let imageURIobject= {
         imageURL:`https://storage.googleapis.com/${CLOUD_BUCKET}/${gcsname}`,
-        "category":["default"]
+        "categories":["default"],
+        createdAt: new Date()
       }
       axios.post(myAddRoute, imageURIobject)
       .then(response=>console.log("RESPONSE", response.data))
@@ -54,7 +55,43 @@ const GCSupload = (req, res) => {
 server.post("/uploadToGCS", GCSupload);
 
 
+const SpecialUpload = (req, res) => {
+  console.count("UPLOADING")
+  const {file} = req.files;
+  const gcsname = uuidv4() + file.name;
+  console.log("FILE", file.name)
+  const files = bucket.file(gcsname);
+
+  fs.createReadStream(file.path)
+    .pipe(files.createWriteStream({
+      metadata: {
+        contentType: file.type
+      }
+    }))
+    .on("error", (err) => {
+      res.json(err);
+    })
+    .on('finish', () => {
+      let imageURIobject= {
+        imageURL:`https://storage.googleapis.com/${CLOUD_BUCKET}/${gcsname}`,
+        "categories":["special"],
+        createdAt: new Date()
+      }
+      axios.post(myAddRoute, imageURIobject)
+      .then(response=>console.log("RESPONSE", response.data))
+      .catch(err=>console.log("ERROR", err))
+      res.json({
+        success: true,
+        fileUrl: `https://storage.googleapis.com/${CLOUD_BUCKET}/${gcsname}`
+      })
+    });
+};
+
+server.post("/SpecialUpload", SpecialUpload);
+
+
 let port= 31023;
 server.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
 });
+console.log(new Date())
