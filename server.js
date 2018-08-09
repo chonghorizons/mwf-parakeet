@@ -7,7 +7,7 @@ const app = express()
 const router = express.Router()
 const cors = require('cors')
 const Storage= require('@google-cloud/storage')
-const Multer = require('multer')
+// const Multer = require('multer')
 const axios = require('axios')
 
 app.use(bodyParser.json())

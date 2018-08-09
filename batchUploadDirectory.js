@@ -1,5 +1,11 @@
+// utility function. This loads all the files froma a directory (myDir) via uploadToGCS.
+// uploadToGCS does two things
+// 1) uploads to google cloud storage
+// 2) adds the image to the MasterDeck.
+
 var fs = require('fs');
 //var myDir= "/Users/howardchong/Downloads/Newpics/"
+
 var files= fs.readdirSync(myDir);
 var axios=require('axios');
 var request=require('request')

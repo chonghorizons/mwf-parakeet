@@ -1,3 +1,5 @@
+// only run once.
+
 const axios = require('axios')
 
 var starterFiles= require('./startingFiles.json');
