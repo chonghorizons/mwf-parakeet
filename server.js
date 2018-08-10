@@ -136,6 +136,6 @@ app.get('/getNRandomCard/:num', function(req,res) {
 
 
 let port= 3195;
-app.listen(port, () => {
-  console.log(`Express server listening on port ${port}`)
+app.listen(process.env.PORT || port, () => {
+  console.log(`Express server listening on port ${process.env.PORT || port}`)
 })
